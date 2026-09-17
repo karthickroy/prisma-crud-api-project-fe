@@ -3,7 +3,10 @@ import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import "./App.css";
 
-const API_URL = "http://localhost:8000/api/employees";
+const rawBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const API_URL = rawBaseUrl.endsWith("/api/employees")
+  ? rawBaseUrl
+  : `${rawBaseUrl.replace(/\/+$/, "")}/api/employees`;
 
 // Deterministic color palette for avatars
 const AVATAR_GRADIENTS = [
