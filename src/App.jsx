@@ -3,7 +3,12 @@ import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import "./App.css";
 
-const rawBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const rawBaseUrl =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD
+    ? "https://prisma-crud-api-project-be.onrender.com"
+    : "http://localhost:8000");
+
 const API_URL = rawBaseUrl.endsWith("/api/employees")
   ? rawBaseUrl
   : `${rawBaseUrl.replace(/\/+$/, "")}/api/employees`;
