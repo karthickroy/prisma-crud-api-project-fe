@@ -3,15 +3,7 @@ import { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import "./App.css";
 
-const rawBaseUrl =
-  import.meta.env.VITE_API_URL ||
-  (import.meta.env.PROD
-    ? "https://prisma-crud-api-project-be.onrender.com"
-    : "http://localhost:8000");
-
-const API_URL = rawBaseUrl.endsWith("/api/employees")
-  ? rawBaseUrl
-  : `${rawBaseUrl.replace(/\/+$/, "")}/api/employees`;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/employees";
 
 // Deterministic color palette for avatars
 const AVATAR_GRADIENTS = [
@@ -70,7 +62,6 @@ const POPULAR_ROLES = [
 function App() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [apiError, setApiError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editingEmployee, setEditingEmployee] = useState(null);
@@ -106,17 +97,10 @@ function App() {
   const fetchEmployees = async () => {
     try {
       setLoading(true);
-      setApiError(null);
       const res = await axios.get(API_URL);
       setEmployees(res.data);
     } catch (err) {
-      console.error("API Fetch Error:", err);
-      const msg =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to load employees";
-      setApiError(msg);
+      console.error(err);
       addToast(err.response?.data?.message || "Failed to load employees", "error");
     } finally {
       setLoading(false);
@@ -449,42 +433,6 @@ function App() {
           </div>
         )}
       </section>
-
-      {/* Error Banner */}
-      {apiError && (
-        <div
-          style={{
-            background: "rgba(244, 63, 94, 0.12)",
-            border: "1px solid rgba(244, 63, 94, 0.35)",
-            borderRadius: "var(--radius-md)",
-            padding: "16px 20px",
-            marginBottom: "24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "12px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#fda4af", fontSize: "14px" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span>
-              <strong>Server Connection Issue:</strong> {apiError.includes("Server selection timeout") || apiError.includes("No available servers") ? "Database connection timeout. Please ensure 0.0.0.0/0 is whitelisted in MongoDB Atlas Network Access." : apiError}
-            </span>
-          </div>
-          <button
-            className="btn-secondary"
-            style={{ fontSize: "12px", padding: "6px 14px" }}
-            onClick={fetchEmployees}
-          >
-            Retry
-          </button>
-        </div>
-      )}
 
       {/* Main Content Area */}
       {loading ? (
